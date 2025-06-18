@@ -51,7 +51,8 @@ def get_pokemon_data(pokemon_name: str) -> dict:
     except requests.RequestException as e:
         logging.error(f"Error fetching data for {pokemon_name}: {e}")
         return {}
-
+def get_data_from_db()-> dict:
+    return {}
 #-- MCP server setup --
 logging.info("Setting up MCP server...")
 
@@ -59,7 +60,8 @@ app = Server("PokemonAPI-server")
 
 # Dicctonary with the tools that will be used in the MCP server
 ADK_API_TOOLS = {
-    "get_pokemon_data": FunctionTool(func=get_pokemon_data)
+    "get_pokemon_data": FunctionTool(func=get_pokemon_data),
+    "get_data_from_DB": FunctionTool(func=get_data_from_db)
 }
 
 @app.list_tools()
