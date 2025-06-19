@@ -1,3 +1,5 @@
 google-adk==1.0.0
 mcp==1.9.1
 Deprecated==1.2.14
+psycopg2-binary
+aiohttp

@@ -6,7 +6,7 @@ import logging
 import os
 
 # You need this to make API requests
-import requests
+import aiohttp
 
 import mcp.server.stdio
 from dotenv import load_dotenv
@@ -34,25 +34,27 @@ logging.basicConfig(
 
 API_ENDPOINT = os.getenv("API_ENDPOINT")
 
-def get_pokemon_data(pokemon_name: str) -> dict:
+async def get_pokemon_data(pokemon_name: str) -> dict:
     """
-    Fetches data for a given Pokémon from the API.
-    
+    Asynchronously fetches data for a given Pokémon from the API.
+
     Args:
         pokemon_name (str): The name of the Pokémon to fetch data for.
-        
+
     Returns:
         dict: The Pokémon data if found, otherwise an empty dictionary.
     """
+    url = f"{API_ENDPOINT}{pokemon_name}"
     try:
-        response = requests.get(f"{API_ENDPOINT}{pokemon_name}")
-        response.raise_for_status()
-        return response.json()
-    except requests.RequestException as e:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                response.raise_for_status()
+                return await response.json()
+    except aiohttp.ClientError as e:
         logging.error(f"Error fetching data for {pokemon_name}: {e}")
         return {}
-def get_data_from_db()-> dict:
-    return {}
+    
+
 #-- MCP server setup --
 logging.info("Setting up MCP server...")
 
@@ -61,7 +63,6 @@ app = Server("PokemonAPI-server")
 # Dicctonary with the tools that will be used in the MCP server
 ADK_API_TOOLS = {
     "get_pokemon_data": FunctionTool(func=get_pokemon_data),
-    "get_data_from_DB": FunctionTool(func=get_data_from_db)
 }
 
 @app.list_tools()
